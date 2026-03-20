@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL, // no fallback
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 10000,
 });
 
@@ -31,6 +31,41 @@ api.interceptors.response.use(
 );
 
 export { api };
+
+
+// import axios from "axios";
+
+// const api = axios.create({
+//   baseURL: import.meta.env.VITE_API_URL, // no fallback
+//   timeout: 10000,
+// });
+
+// // Attach JWT
+// api.interceptors.request.use((config) => {
+//   const token = localStorage.getItem("token");
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`;
+//   }
+//   return config;
+// });
+
+// // Handle 401
+// api.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response?.status === 401) {
+//       localStorage.removeItem("token");
+//       localStorage.removeItem("user");
+
+//       if (window.location.pathname !== "/login") {
+//         window.location.href = "/login";
+//       }
+//     }
+//     return Promise.reject(error);
+//   }
+// );
+
+// export { api };
 
 
 // import axios from "axios";
