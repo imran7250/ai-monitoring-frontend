@@ -1,384 +1,10 @@
-// import { useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import KPIBar from "../../components/dashboard/KPIBar";
-// import {
-//   getDashboardSummary,
-//   getRecentIncidents,
-//   getRecentNotifications,
-//   getAnomalySummary,
-// } from "../../api/dashboard.api";
-// import {
-//   Activity,
-//   AlertTriangle,
-//   Bell,
-//   Server,
-//   Shield,
-//   CheckCircle,
-//   XCircle,
-//   AlertCircle,
-//   RefreshCw,
-// } from "lucide-react";
-// import { formatDate } from "../../utils/dateUtils";
-
-// // ✅ FIX #6 — Background style moved outside component (not recreated every render)
-// const BG_GRID_STYLE = {
-//   backgroundImage: `
-//     linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-//     linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
-//   `,
-//   backgroundSize: "50px 50px",
-// };
-
-// export default function Dashboard() {
-//   const navigate = useNavigate();
-
-//   const [summary, setSummary] = useState(null);
-//   const [incidents, setIncidents] = useState([]);
-//   const [notifications, setNotifications] = useState([]);
-//   const [aiSummary, setAiSummary] = useState(null);
-//   const [isRefreshing, setIsRefreshing] = useState(false);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     loadAll();
-//   }, []);
-
-//   // ✅ FIX #6 — Promise.allSettled loads both simultaneously
-//   // Each failure is handled independently — one failing doesn't block the other
-//   const loadAll = async () => {
-//     setError(null);
-//     const [dashResult, aiResult] = await Promise.allSettled([
-//       loadDashboard(),
-//       loadAIInsights(),
-//     ]);
-//     if (dashResult.status === "rejected")
-//       console.error("Dashboard load failed:", dashResult.reason);
-//     if (aiResult.status === "rejected")
-//       console.error("AI insights load failed:", aiResult.reason);
-//   };
-
-//   // const loadDashboard = async () => {
-//   //   const [summaryData, incidentData, notificationData] = await Promise.all([
-//   //     getDashboardSummary(),
-//   //     getRecentIncidents(),
-//   //     getRecentNotifications(),
-//   //   ]);
-//   //   setSummary(summaryData);
-//   //   setIncidents(incidentData);
-//   //   setNotifications(notificationData);
-//   // };
-
-//   const loadDashboard = async () => {
-//   // ✅ FIX — allSettled means one failing API won't blank the entire dashboard
-//   const [summaryRes, incidentRes, notifRes] = await Promise.allSettled([
-//     getDashboardSummary(),
-//     getRecentIncidents(),
-//     getRecentNotifications(),
-//   ]);
-
-//   if (summaryRes.status === "fulfilled") setSummary(summaryRes.value);
-//   else console.error("Dashboard summary failed:", summaryRes.reason);
-
-//   if (incidentRes.status === "fulfilled") setIncidents(incidentRes.value);
-//   else console.error("Incidents failed:", incidentRes.reason);
-
-//   if (notifRes.status === "fulfilled") setNotifications(notifRes.value);
-//   else console.error("Notifications failed:", notifRes.reason);
-// };
-
-
-//   const loadAIInsights = async () => {
-//     const data = await getAnomalySummary();
-//     setAiSummary(data);
-//   };
-
-//   const handleRefresh = async () => {
-//     setIsRefreshing(true);
-//     await loadAll();
-//     setIsRefreshing(false);
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-
-//       {/* Background pattern — style defined outside component */}
-//       <div className="fixed inset-0 pointer-events-none" style={{ ...BG_GRID_STYLE, opacity: 0.02 }} />
-
-//       <div className="relative max-w-7xl mx-auto px-6 py-8 space-y-8">
-
-//         {/* Header */}
-//         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-//           <div className="flex items-center gap-3">
-//             <div className="p-2.5 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl">
-//               <Activity className="w-6 h-6 text-white" />
-//             </div>
-//             <div>
-//               <h1 className="text-4xl font-bold text-white">System Overview</h1>
-//               <div className="flex items-center gap-2 mt-1">
-//                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-//                 <p className="text-sm text-slate-400">
-//                   Real-time health and activity across all monitored services
-//                 </p>
-//               </div>
-//             </div>
-//           </div>
-
-//           <button
-//             onClick={handleRefresh}
-//             disabled={isRefreshing}
-//             className="p-3 bg-slate-800/50 border border-slate-700 rounded-xl hover:bg-slate-700/50 transition-all"
-//           >
-//             <RefreshCw className={`w-5 h-5 text-slate-400 ${isRefreshing ? "animate-spin" : ""}`} />
-//           </button>
-//         </div>
-
-//         {/* KPI Strip */}
-//         <KPIBar summary={summary} aiSummary={aiSummary} incidents={incidents} />
-
-//         {/* AI Insights Panel */}
-//         <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-8">
-//           <div className="flex items-center gap-4 mb-8">
-//             <div className="p-3 bg-indigo-500/20 rounded-xl">
-//               <Shield className="w-7 h-7 text-indigo-400" />
-//             </div>
-//             <div>
-//               <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-//                 AI Insights
-//                 <span className="px-2 py-1 bg-indigo-500/10 border border-indigo-500/30 rounded-full text-xs text-indigo-300">
-//                   LIVE
-//                 </span>
-//               </h2>
-//               <p className="text-sm text-slate-400">Anomaly intelligence engine</p>
-//             </div>
-//           </div>
-
-//           {!aiSummary ? (
-//             <div className="flex items-center justify-center py-16">
-//               <div className="w-16 h-16 border-4 border-slate-700 border-t-indigo-500 rounded-full animate-spin" />
-//               <span className="ml-4 text-slate-400">Loading AI insights...</span>
-//             </div>
-//           ) : (
-//             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-//               <div
-//                 onClick={() => navigate("/services?anomaly=true")}
-//                 className="bg-indigo-950/30 border border-indigo-500/20 rounded-xl p-6 hover:border-indigo-500/40 transition-all cursor-pointer"
-//               >
-//                 <p className="text-indigo-300 text-sm mb-2">Services with anomalies</p>
-//                 <p className="text-4xl font-bold text-white">{aiSummary.servicesAffected}</p>
-//                 <p className="text-xs text-slate-500 mt-2">Last 24 hours</p>
-//               </div>
-
-//               <div className="bg-purple-950/30 border border-purple-500/20 rounded-xl p-6 hover:border-purple-500/40 transition-all">
-//                 <p className="text-purple-300 text-sm mb-2">Total anomalies (24h)</p>
-//                 <p className="text-4xl font-bold text-white">{aiSummary.totalAnomalies}</p>
-//                 <p className="text-xs text-slate-500 mt-2">Detected issues</p>
-//               </div>
-
-//               <div className="bg-red-950/30 border border-red-500/20 rounded-xl p-6 hover:border-red-500/40 transition-all">
-//                 <p className="text-red-300 text-sm mb-2">Highest deviation</p>
-//                 <p className="text-4xl font-bold text-white">
-//                   {aiSummary.highestDeviation?.toFixed(2)}σ
-//                 </p>
-//                 <p className="text-xs text-slate-500 mt-2">Standard deviation</p>
-//               </div>
-
-//               <div className="bg-yellow-950/30 border border-yellow-500/20 rounded-xl p-6 hover:border-yellow-500/40 transition-all">
-//                 <p className="text-yellow-300 text-sm mb-2">Most unstable service</p>
-//                 <p className="text-xl font-semibold text-white truncate">
-//                   {aiSummary.mostUnstableService}
-//                 </p>
-//                 <p className="text-xs text-slate-500 mt-2">Requires attention</p>
-//               </div>
-//             </div>
-//           )}
-//         </div>
-
-//         {/* Service Status Overview */}
-//         {summary && (
-//           <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-8">
-//             <div className="flex items-center gap-3 mb-8">
-//               <div className="p-2.5 bg-blue-500/20 rounded-xl">
-//                 <Server className="w-6 h-6 text-blue-400" />
-//               </div>
-//               <div>
-//                 <h2 className="text-2xl font-bold text-white">Service Status Overview</h2>
-//                 <p className="text-sm text-slate-400">
-//                   Total: {summary.totalServices} services
-//                 </p>
-//               </div>
-//             </div>
-
-//             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-//               <div
-//                 onClick={() => navigate("/services?status=UP")}
-//                 className="bg-emerald-950/30 border border-emerald-500/20 rounded-xl p-6 hover:border-emerald-500/40 transition-all cursor-pointer"
-//               >
-//                 <CheckCircle className="w-5 h-5 text-emerald-400 mb-4" />
-//                 <p className="text-emerald-400 text-sm mb-1">Running Normally</p>
-//                 <p className="text-4xl font-bold text-white mb-2">{summary.upServices}</p>
-//                 <p className="text-xs text-slate-400">Services working without issues</p>
-//               </div>
-
-//               <div
-//                 onClick={() => navigate("/services?status=DEGRADED")}
-//                 className="bg-yellow-950/30 border border-yellow-500/20 rounded-xl p-6 hover:border-yellow-500/40 transition-all cursor-pointer"
-//               >
-//                 <AlertCircle className="w-5 h-5 text-yellow-400 mb-4" />
-//                 <p className="text-yellow-400 text-sm mb-1">Performance Issues</p>
-//                 <p className="text-4xl font-bold text-white mb-2">{summary.degradedServices}</p>
-//                 <p className="text-xs text-slate-400">Slower or unstable performance</p>
-//               </div>
-
-//               <div
-//                 onClick={() => navigate("/services?status=DOWN")}
-//                 className="bg-red-950/30 border border-red-500/20 rounded-xl p-6 hover:border-red-500/40 transition-all cursor-pointer"
-//               >
-//                 <XCircle className="w-5 h-5 text-red-400 mb-4" />
-//                 <p className="text-red-400 text-sm mb-1">Services Down</p>
-//                 <p className="text-4xl font-bold text-white mb-2">{summary.downServices}</p>
-//                 <p className="text-xs text-slate-400">Currently unavailable</p>
-//               </div>
-//             </div>
-//           </div>
-//         )}
-
-//         {/* Incidents + Notifications */}
-//         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-//           {/* Incidents */}
-//           <div className="bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden">
-//             <div className="p-6 border-b border-slate-800 flex items-center gap-3">
-//               <div className="p-2.5 bg-red-500/10 rounded-lg">
-//                 <AlertTriangle className="w-5 h-5 text-red-400" />
-//               </div>
-//               <div>
-//                 <h2 className="text-xl font-semibold text-white">Recent Incidents</h2>
-//                 <p className="text-xs text-slate-400">
-//                   {incidents.length} active incident{incidents.length !== 1 ? "s" : ""}
-//                 </p>
-//               </div>
-//             </div>
-
-//             <div className="p-6">
-//               {incidents.length === 0 ? (
-//                 <div className="flex flex-col items-center justify-center py-12 text-center">
-//                   <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mb-4">
-//                     <CheckCircle className="w-10 h-10 text-emerald-400" />
-//                   </div>
-//                   <p className="text-slate-400 font-medium">No active incidents</p>
-//                   <p className="text-sm text-slate-500 mt-1">All systems are running smoothly</p>
-//                 </div>
-//               ) : (
-//                 <div className="space-y-3">
-//                   {incidents.map((incident, index) => (
-//                     <div
-//                       key={incident.incidentId || index}
-//                       className="bg-red-500/5 border border-red-500/20 rounded-xl p-5"
-//                     >
-//                       <div className="flex items-center gap-3 flex-wrap">
-//                         <h3 className="font-semibold text-red-300">{incident.serviceName}</h3>
-//                         <span className="px-2 py-1 bg-red-500/20 rounded-full text-xs text-red-300">
-//                           {incident.status}
-//                         </span>
-//                       </div>
-//                       <div className="mt-2">
-//                         <span className="flex items-center gap-1.5 px-3 py-1 bg-red-500/20 rounded-full w-fit">
-//                           <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
-//                           <span className="text-xs text-red-300 font-medium">ACTIVE</span>
-//                         </span>
-//                       </div>
-//                     </div>
-//                   ))}
-//                 </div>
-//               )}
-//             </div>
-//           </div>
-
-//           {/* Notifications */}
-//           <div className="bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden">
-//             <div className="p-6 border-b border-slate-800 flex items-center justify-between">
-//               <div className="flex items-center gap-3">
-//                 <div className="p-2.5 bg-blue-500/10 rounded-lg">
-//                   <Bell className="w-5 h-5 text-blue-400" />
-//                 </div>
-//                 <div>
-//                   <h2 className="text-xl font-semibold text-white">Notifications</h2>
-//                   <p className="text-xs text-slate-400">
-//                     {notifications.length} new
-//                   </p>
-//                 </div>
-//               </div>
-//               <div className="flex items-center gap-2">
-//                 <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-//                 <span className="text-xs text-slate-400">Live</span>
-//               </div>
-//             </div>
-
-//             <div className="p-6">
-//               {notifications.length === 0 ? (
-//                 <div className="flex flex-col items-center justify-center py-12 text-center">
-//                   <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mb-4">
-//                     <Bell className="w-10 h-10 text-slate-600" />
-//                   </div>
-//                   <p className="text-slate-400 font-medium">No notifications</p>
-//                   <p className="text-sm text-slate-500 mt-1">You're all caught up</p>
-//                 </div>
-//               ) : (
-//                 <div className="space-y-3">
-//                   {notifications.map((notification, index) => (
-//                     <div
-//                       key={notification.id || index}
-//                       className="bg-slate-800/30 border border-slate-700 rounded-xl p-5"
-//                     >
-//                       <p className="text-slate-200">{notification.message}</p>
-//                       <p className="text-xs text-slate-500 mt-2">
-//                         {notification.sentAt
-//                           ? formatDate(notification.sentAt)
-//                           : "Unknown time"}
-//                       </p>
-//                     </div>
-//                   ))}
-//                 </div>
-//               )}
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* ✅ FIX #7 — Footer: ?? 0 prevents "undefined service(s) down" */}
-//         <div className="flex items-center justify-between text-xs text-slate-500 pt-4 border-t border-slate-800">
-//           <div className="flex items-center gap-4">
-//             <div className="flex items-center gap-2">
-//               <span className="inline-block w-2 h-2 rounded-full bg-emerald-400" />
-//               <span>
-//                 {(summary?.downServices ?? 0) === 0
-//                   ? "All systems operational"
-//                   : `${summary.downServices} service(s) down`}
-//               </span>
-//             </div>
-//             <div className="flex items-center gap-2">
-//               <span className="inline-block w-2 h-2 rounded-full bg-blue-400" />
-//               <span>AI Engine {aiSummary ? "Active" : "Loading"}</span>
-//             </div>
-//           </div>
-//           <div className="flex items-center gap-4">
-//             <span>Last updated: {new Date().toLocaleTimeString()}</span>
-//             <span>•</span>
-//             <span>Real-time updates</span>
-//           </div>
-//         </div>
-
-//       </div>
-//     </div>
-//   );
-// }
-
 // D:\Ai_Monitoring_Platform\ai-monitoring-ui\src\pages\dashboard\Dashboard.jsx
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import KPIBar from "../../components/dashboard/KPIBar";
 import {
-  getDashboardSummary,
+  getDashboardSummary, 
   getRecentIncidents,
   getRecentNotifications,
   getAnomalySummary,
@@ -390,19 +16,14 @@ import {
   Server,
   Shield,
   CheckCircle,
-  XCircle,
   AlertCircle,
   RefreshCw,
+  TrendingUp,
+  Zap,
+  BarChart3,
 } from "lucide-react";
 import { formatDate } from "../../utils/dateUtils";
-
-const BG_GRID_STYLE = {
-  backgroundImage: `
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
-  `,
-  backgroundSize: "50px 50px",
-};
+import PageHeader from "../../components/ui/PageHeader";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -412,14 +33,15 @@ export default function Dashboard() {
   const [notifications, setNotifications] = useState([]);
   const [aiSummary, setAiSummary] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [error, setError] = useState(null);
+  const [liveTime, setLiveTime] = useState(new Date());
 
   useEffect(() => {
     loadAll();
+    const timer = setInterval(() => setLiveTime(new Date()), 1000);
+    return () => clearInterval(timer);
   }, []);
 
   const loadAll = async () => {
-    setError(null);
     const [dashResult, aiResult] = await Promise.allSettled([
       loadDashboard(),
       loadAIInsights(),
@@ -453,195 +75,247 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      <div className="fixed inset-0 pointer-events-none" style={{ ...BG_GRID_STYLE, opacity: 0.02 }} />
+    <div className="min-h-screen bg-white">
+      {/* ✅ No grid lines - pure white background */}
 
-      <div className="relative max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 space-y-4 sm:space-y-6 md:space-y-8">
+      <PageHeader title="Dashboard" />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 sm:p-2.5 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex-shrink-0">
-              <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            <div className="p-2.5 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg">
+              <Activity className="w-5 h-5 text-white" />
             </div>
-            <div className="min-w-0">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white truncate">
-                System Overview
-              </h1>
-              <div className="flex items-center gap-2 mt-0.5 sm:mt-1">
-                <span className="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
-                <p className="text-xs sm:text-sm text-slate-400 truncate">
-                  Real-time health across all services
-                </p>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">System Overview</h1>
+              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                <p className="text-sm text-gray-500">All systems operational</p>
+                <span className="text-gray-300 hidden xs:inline">•</span>
+                <span className="text-xs text-gray-400 font-mono hidden xs:inline">
+                  {liveTime.toLocaleTimeString()}
+                </span>
               </div>
             </div>
           </div>
 
-          <button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="p-2 sm:p-3 bg-slate-800/50 border border-slate-700 rounded-xl hover:bg-slate-700/50 transition-all flex-shrink-0 self-start sm:self-auto"
-            aria-label="Refresh dashboard"
-          >
-            <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 text-slate-400 ${isRefreshing ? "animate-spin" : ""}`} />
-          </button>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg">
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+              <span className="text-xs text-emerald-700 font-medium">Live</span>
+            </div>
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 text-gray-500 ${isRefreshing ? "animate-spin" : ""}`} />
+            </button>
+          </div>
         </div>
 
-        {/* KPI Strip - Responsive */}
+        {/* KPI Strip */}
         <KPIBar summary={summary} aiSummary={aiSummary} incidents={incidents} />
 
-        {/* AI Insights Panel - Responsive grid */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-6 md:p-8">
-          <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6 md:mb-8">
-            <div className="p-2 sm:p-3 bg-indigo-500/20 rounded-xl flex-shrink-0">
-              <Shield className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-indigo-400" />
+        {/* Quick Stats Grid */}
+        {summary && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Total Services</span>
+                <Server size={16} className="text-gray-700" />
+              </div>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">{summary.totalServices}</p>
+              <div className="flex items-center gap-3 mt-2 text-[10px] sm:text-xs">
+                <span className="flex items-center gap-1 text-emerald-600">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  {summary.upServices}
+                </span>
+                <span className="flex items-center gap-1 text-yellow-600">
+                  <span className="w-1.5 h-1.5 rounded-full bg-yellow-500" />
+                  {summary.degradedServices}
+                </span>
+                <span className="flex items-center gap-1 text-red-600">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                  {summary.downServices}
+                </span>
+              </div>
             </div>
-            <div className="min-w-0">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white flex items-center gap-2 flex-wrap">
-                AI Insights
-                <span className="px-2 py-0.5 sm:py-1 bg-indigo-500/10 border border-indigo-500/30 rounded-full text-[10px] sm:text-xs text-indigo-300 whitespace-nowrap">
-                  LIVE
+
+            <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Health Score</span>
+                <Activity size={16} className="text-emerald-600" />
+              </div>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">
+                {summary.totalServices > 0
+                  ? Math.round((summary.upServices / summary.totalServices) * 100)
+                  : 100}%
+              </p>
+              <div className="mt-2 h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-emerald-400 to-gray-700 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${summary.totalServices > 0
+                      ? Math.round((summary.upServices / summary.totalServices) * 100)
+                      : 100}%`,
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">AI Anomalies</span>
+                <Zap size={16} className="text-purple-600" />
+              </div>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">{aiSummary?.totalAnomalies || 0}</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 mt-2">Last 24 hours</p>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Active Incidents</span>
+                <AlertTriangle size={16} className="text-red-600" />
+              </div>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">{incidents.length}</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 mt-2">
+                {incidents.length === 0 ? "All clear" : `${incidents.length} requiring attention`}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* AI Insights Panel */}
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6">
+          <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <div className="p-2.5 sm:p-3 bg-purple-50 rounded-xl border border-purple-200">
+              <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                AI Intelligence
+                <span className="px-2 py-0.5 bg-purple-100 border border-purple-300 rounded-full text-[8px] sm:text-[10px] text-purple-700 font-medium tracking-wider uppercase">
+                  Live
                 </span>
               </h2>
-              <p className="text-xs sm:text-sm text-slate-400">Anomaly intelligence engine</p>
+              <p className="text-xs sm:text-sm text-gray-500">Anomaly detection & predictive insights</p>
             </div>
           </div>
 
           {!aiSummary ? (
-            <div className="flex items-center justify-center py-12 sm:py-16">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-slate-700 border-t-indigo-500 rounded-full animate-spin" />
-              <span className="ml-3 sm:ml-4 text-slate-400 text-sm sm:text-base">Loading AI insights...</span>
+            <div className="flex items-center justify-center py-8 sm:py-12">
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 border-3 border-gray-300 border-t-purple-600 rounded-full animate-spin" />
+                <span className="text-xs sm:text-sm text-gray-500">Loading AI insights...</span>
+              </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <div
-                onClick={() => navigate("/services?anomaly=true")}
-                className="bg-indigo-950/30 border border-indigo-500/20 rounded-xl p-4 sm:p-5 md:p-6 hover:border-indigo-500/40 transition-all cursor-pointer"
+                onClick={() => navigate("/anomalies")}
+                className="bg-purple-50 border border-purple-200 rounded-xl p-4 sm:p-5 hover:border-purple-400 hover:bg-purple-100 transition-all cursor-pointer group"
               >
-                <p className="text-indigo-300 text-xs sm:text-sm mb-1 sm:mb-2">Services with anomalies</p>
-                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">{aiSummary.servicesAffected}</p>
-                <p className="text-[10px] sm:text-xs text-slate-500 mt-1 sm:mt-2">Last 24 hours</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] sm:text-xs text-purple-700 uppercase tracking-wider">Services Affected</span>
+                  <div className="p-1 bg-purple-200 rounded-lg group-hover:scale-110 transition-transform">
+                    <Zap size={12} className="text-purple-600" />
+                  </div>
+                </div>
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 mt-2">{aiSummary.servicesAffected}</p>
+                <p className="text-[10px] sm:text-xs text-gray-500 mt-1">with anomalies detected</p>
               </div>
 
-              <div className="bg-purple-950/30 border border-purple-500/20 rounded-xl p-4 sm:p-5 md:p-6 hover:border-purple-500/40 transition-all">
-                <p className="text-purple-300 text-xs sm:text-sm mb-1 sm:mb-2">Total anomalies (24h)</p>
-                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">{aiSummary.totalAnomalies}</p>
-                <p className="text-[10px] sm:text-xs text-slate-500 mt-1 sm:mt-2">Detected issues</p>
+              <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 sm:p-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] sm:text-xs text-indigo-700 uppercase tracking-wider">Total Anomalies</span>
+                  <BarChart3 size={16} className="text-indigo-600" />
+                </div>
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 mt-2">{aiSummary.totalAnomalies}</p>
+                <p className="text-[10px] sm:text-xs text-gray-500 mt-1">in the last 24 hours</p>
               </div>
 
-              <div className="bg-red-950/30 border border-red-500/20 rounded-xl p-4 sm:p-5 md:p-6 hover:border-red-500/40 transition-all">
-                <p className="text-red-300 text-xs sm:text-sm mb-1 sm:mb-2">Highest deviation</p>
-                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-                  {aiSummary.highestDeviation?.toFixed(2)}σ
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 sm:p-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] sm:text-xs text-red-700 uppercase tracking-wider">Highest Deviation</span>
+                  <TrendingUp size={16} className="text-red-600" />
+                </div>
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 mt-2">
+                  {aiSummary.highestDeviation?.toFixed(1)}σ
                 </p>
-                <p className="text-[10px] sm:text-xs text-slate-500 mt-1 sm:mt-2">Standard deviation</p>
+                <p className="text-[10px] sm:text-xs text-gray-500 mt-1">standard deviations</p>
               </div>
 
-              <div className="bg-yellow-950/30 border border-yellow-500/20 rounded-xl p-4 sm:p-5 md:p-6 hover:border-yellow-500/40 transition-all">
-                <p className="text-yellow-300 text-xs sm:text-sm mb-1 sm:mb-2">Most unstable service</p>
-                <p className="text-base sm:text-lg md:text-xl font-semibold text-white truncate">
-                  {aiSummary.mostUnstableService}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 sm:p-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] sm:text-xs text-yellow-700 uppercase tracking-wider">Most Unstable</span>
+                  <AlertCircle size={16} className="text-yellow-600" />
+                </div>
+                <p className="text-base sm:text-xl font-bold text-gray-900 mt-2 truncate">
+                  {aiSummary.mostUnstableService || "None"}
                 </p>
-                <p className="text-[10px] sm:text-xs text-slate-500 mt-1 sm:mt-2">Requires attention</p>
+                <p className="text-[10px] sm:text-xs text-gray-500 mt-1">requires immediate attention</p>
               </div>
             </div>
           )}
         </div>
 
-        {/* Service Status Overview - Responsive grid */}
-        {summary && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 md:p-8">
-            <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6 md:mb-8">
-              <div className="p-2 sm:p-2.5 bg-blue-500/20 rounded-xl flex-shrink-0">
-                <Server className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
-              </div>
-              <div className="min-w-0">
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white">Service Status Overview</h2>
-                <p className="text-xs sm:text-sm text-slate-400">
-                  Total: {summary.totalServices} services
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-              <div
-                onClick={() => navigate("/services?status=UP")}
-                className="bg-emerald-950/30 border border-emerald-500/20 rounded-xl p-4 sm:p-5 md:p-6 hover:border-emerald-500/40 transition-all cursor-pointer"
-              >
-                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 mb-3 sm:mb-4" />
-                <p className="text-emerald-400 text-xs sm:text-sm mb-0.5 sm:mb-1">Running Normally</p>
-                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1 sm:mb-2">{summary.upServices}</p>
-                <p className="text-[10px] sm:text-xs text-slate-400">Services working without issues</p>
-              </div>
-
-              <div
-                onClick={() => navigate("/services?status=DEGRADED")}
-                className="bg-yellow-950/30 border border-yellow-500/20 rounded-xl p-4 sm:p-5 md:p-6 hover:border-yellow-500/40 transition-all cursor-pointer"
-              >
-                <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 mb-3 sm:mb-4" />
-                <p className="text-yellow-400 text-xs sm:text-sm mb-0.5 sm:mb-1">Performance Issues</p>
-                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1 sm:mb-2">{summary.degradedServices}</p>
-                <p className="text-[10px] sm:text-xs text-slate-400">Slower or unstable performance</p>
-              </div>
-
-              <div
-                onClick={() => navigate("/services?status=DOWN")}
-                className="bg-red-950/30 border border-red-500/20 rounded-xl p-4 sm:p-5 md:p-6 hover:border-red-500/40 transition-all cursor-pointer"
-              >
-                <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 mb-3 sm:mb-4" />
-                <p className="text-red-400 text-xs sm:text-sm mb-0.5 sm:mb-1">Services Down</p>
-                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1 sm:mb-2">{summary.downServices}</p>
-                <p className="text-[10px] sm:text-xs text-slate-400">Currently unavailable</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Incidents + Notifications - Responsive grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+        {/* Incidents + Notifications */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 
           {/* Incidents */}
-          <div className="bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden">
-            <div className="p-4 sm:p-5 md:p-6 border-b border-slate-800 flex items-center gap-3">
-              <div className="p-2 sm:p-2.5 bg-red-500/10 rounded-lg flex-shrink-0">
-                <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" />
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+            <div className="p-4 sm:p-5 border-b border-gray-200 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 sm:p-2 bg-red-50 rounded-xl border border-red-200">
+                  <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
+                </div>
+                <div>
+                  <h2 className="text-sm sm:text-base font-semibold text-gray-900">Incidents</h2>
+                  <p className="text-[10px] sm:text-xs text-gray-500">
+                    {incidents.length} active incident{incidents.length !== 1 ? "s" : ""}
+                  </p>
+                </div>
               </div>
-              <div className="min-w-0">
-                <h2 className="text-base sm:text-lg md:text-xl font-semibold text-white">Recent Incidents</h2>
-                <p className="text-xs text-slate-400">
-                  {incidents.length} active incident{incidents.length !== 1 ? "s" : ""}
-                </p>
-              </div>
+              {incidents.length > 0 && (
+                <button
+                  onClick={() => navigate("/incidents")}
+                  className="text-[10px] sm:text-xs text-gray-600 hover:text-gray-900 font-medium"
+                >
+                  View all →
+                </button>
+              )}
             </div>
 
-            <div className="p-4 sm:p-5 md:p-6">
+            <div className="p-4 sm:p-5">
               {incidents.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8 sm:py-10 md:py-12 text-center">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mb-3 sm:mb-4">
-                    <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-400" />
+                <div className="flex flex-col items-center justify-center py-6 sm:py-8 text-center">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-emerald-50 rounded-full flex items-center justify-center mb-3 sm:mb-4">
+                    <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-600" />
                   </div>
-                  <p className="text-slate-400 font-medium text-sm sm:text-base">No active incidents</p>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-1">All systems are running smoothly</p>
+                  <p className="text-sm sm:text-base text-gray-500 font-medium">No active incidents</p>
+                  <p className="text-xs sm:text-sm text-gray-400 mt-1">All systems are running smoothly</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {incidents.map((incident, index) => (
+                <div className="space-y-2 sm:space-y-3">
+                  {incidents.slice(0, 3).map((incident, index) => (
                     <div
                       key={incident.incidentId || index}
-                      className="bg-red-500/5 border border-red-500/20 rounded-xl p-4 sm:p-5"
+                      className="flex items-center justify-between p-2.5 sm:p-3 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors cursor-pointer"
+                      onClick={() => navigate(`/incidents/${incident.incidentId}`)}
                     >
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <h3 className="font-semibold text-red-300 text-sm sm:text-base truncate">{incident.serviceName}</h3>
-                        <span className="px-2 py-1 bg-red-500/20 rounded-full text-[10px] sm:text-xs text-red-300 whitespace-nowrap">
-                          {incident.status}
-                        </span>
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full animate-pulse" />
+                        <div>
+                          <p className="text-xs sm:text-sm font-medium text-gray-900">{incident.serviceName}</p>
+                          <p className="text-[10px] sm:text-xs text-gray-500">{incident.reason?.slice(0, 40)}...</p>
+                        </div>
                       </div>
-                      <div className="mt-2">
-                        <span className="flex items-center gap-1.5 px-3 py-1 bg-red-500/20 rounded-full w-fit">
-                          <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-400 rounded-full animate-pulse" />
-                          <span className="text-[10px] sm:text-xs text-red-300 font-medium">ACTIVE</span>
-                        </span>
-                      </div>
+                      <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-red-200 rounded-lg text-[10px] sm:text-xs text-red-700 font-medium">
+                        {incident.status}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -650,47 +324,54 @@ export default function Dashboard() {
           </div>
 
           {/* Notifications */}
-          <div className="bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden">
-            <div className="p-4 sm:p-5 md:p-6 border-b border-slate-800 flex items-center justify-between">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="p-2 sm:p-2.5 bg-blue-500/10 rounded-lg flex-shrink-0">
-                  <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+            <div className="p-4 sm:p-5 border-b border-gray-200 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 sm:p-2 bg-blue-50 rounded-xl border border-blue-200">
+                  <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 </div>
-                <div className="min-w-0">
-                  <h2 className="text-base sm:text-lg md:text-xl font-semibold text-white">Notifications</h2>
-                  <p className="text-xs text-slate-400">
-                    {notifications.length} new
+                <div>
+                  <h2 className="text-sm sm:text-base font-semibold text-gray-900">Notifications</h2>
+                  <p className="text-[10px] sm:text-xs text-gray-500">
+                    {notifications.length} new notification{notifications.length !== 1 ? "s" : ""}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-400 animate-pulse" />
-                <span className="text-[10px] sm:text-xs text-slate-400">Live</span>
-              </div>
+              {notifications.length > 0 && (
+                <button
+                  onClick={() => navigate("/notifications")}
+                  className="text-[10px] sm:text-xs text-gray-600 hover:text-gray-900 font-medium"
+                >
+                  View all →
+                </button>
+              )}
             </div>
 
-            <div className="p-4 sm:p-5 md:p-6">
+            <div className="p-4 sm:p-5">
               {notifications.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8 sm:py-10 md:py-12 text-center">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-800 rounded-full flex items-center justify-center mb-3 sm:mb-4">
-                    <Bell className="w-8 h-8 sm:w-10 sm:h-10 text-slate-600" />
+                <div className="flex flex-col items-center justify-center py-6 sm:py-8 text-center">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3 sm:mb-4">
+                    <Bell className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
                   </div>
-                  <p className="text-slate-400 font-medium text-sm sm:text-base">No notifications</p>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-1">You're all caught up</p>
+                  <p className="text-sm sm:text-base text-gray-500 font-medium">No notifications</p>
+                  <p className="text-xs sm:text-sm text-gray-400 mt-1">You're all caught up</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {notifications.map((notification, index) => (
+                <div className="space-y-2 sm:space-y-3">
+                  {notifications.slice(0, 3).map((notification, index) => (
                     <div
                       key={notification.id || index}
-                      className="bg-slate-800/30 border border-slate-700 rounded-xl p-4 sm:p-5"
+                      className="flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors"
                     >
-                      <p className="text-slate-200 text-sm sm:text-base break-words">{notification.message}</p>
-                      <p className="text-[10px] sm:text-xs text-slate-500 mt-2">
-                        {notification.sentAt
-                          ? formatDate(notification.sentAt)
-                          : "Unknown time"}
-                      </p>
+                      <div className="p-1 bg-blue-100 rounded-lg flex-shrink-0">
+                        <Bell size={12} className="text-blue-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm text-gray-700 truncate">{notification.message}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5">
+                          {notification.sentAt ? formatDate(notification.sentAt) : "Unknown time"}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -700,23 +381,21 @@ export default function Dashboard() {
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col xs:flex-row items-center justify-between gap-2 text-[10px] sm:text-xs text-slate-500 pt-3 sm:pt-4 border-t border-slate-800">
-          <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center xs:justify-start">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400" />
-              <span>
-                {(summary?.downServices ?? 0) === 0
-                  ? "All systems operational"
-                  : `${summary.downServices} service(s) down`}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-400" />
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-3 sm:pt-4 border-t border-gray-200 text-[10px] sm:text-xs text-gray-500">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+              <span>{(summary?.downServices ?? 0) === 0 ? "All systems operational" : `${summary.downServices} service(s) down`}</span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-purple-500 rounded-full" />
               <span>AI Engine {aiSummary ? "Active" : "Loading"}</span>
-            </div>
+            </span>
           </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <span>Updated: {new Date().toLocaleTimeString()}</span>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <span>Last updated: {liveTime.toLocaleTimeString()}</span>
+            <span className="text-gray-300">•</span>
+            <span className="text-gray-400">Real-time updates</span>
           </div>
         </div>
 
@@ -724,4 +403,3 @@ export default function Dashboard() {
     </div>
   );
 }
-

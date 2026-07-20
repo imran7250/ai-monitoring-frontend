@@ -44,25 +44,28 @@ export default function IncidentDetails() {
 
   const severityConfig = {
     CRITICAL: { 
-      bg: "bg-red-500/10", 
-      border: "border-red-500/30", 
-      text: "text-red-400", 
+      bg: "bg-red-50", 
+      border: "border-red-200", 
+      text: "text-red-700", 
       icon: XCircle, 
-      label: "Critical" 
+      label: "Critical",
+      dot: "bg-red-500"
     },
     HIGH: { 
-      bg: "bg-orange-500/10", 
-      border: "border-orange-500/30", 
-      text: "text-orange-400", 
+      bg: "bg-orange-50", 
+      border: "border-orange-200", 
+      text: "text-orange-700", 
       icon: AlertTriangle, 
-      label: "High" 
+      label: "High",
+      dot: "bg-orange-500"
     },
     LOW: { 
-      bg: "bg-blue-500/10", 
-      border: "border-blue-500/30", 
-      text: "text-blue-400", 
+      bg: "bg-blue-50", 
+      border: "border-blue-200", 
+      text: "text-blue-700", 
       icon: Activity, 
-      label: "Low" 
+      label: "Low",
+      dot: "bg-blue-500"
     },
   };
 
@@ -78,13 +81,12 @@ export default function IncidentDetails() {
     }
   };
 
-  // ✅ Responsive loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-slate-700 border-t-blue-500 rounded-full animate-spin mx-auto mb-3 sm:mb-4" />
-          <p className="text-slate-400 text-xs sm:text-sm">Loading incident details...</p>
+          <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-gray-200 border-t-gray-700 rounded-full animate-spin mx-auto mb-3 sm:mb-4" />
+          <p className="text-gray-500 text-xs sm:text-sm">Loading incident details...</p>
         </div>
       </div>
     );
@@ -98,14 +100,14 @@ export default function IncidentDetails() {
   const isAcknowledged = incident.status === "ACKNOWLEDGED";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-white">
 
-      {/* ✅ Responsive Header */}
-      <div className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800 px-3 sm:px-4 md:px-6 py-3 sm:py-4">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-3 sm:px-4 md:px-6 py-3 sm:py-4 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2 sm:gap-3">
           <button
             onClick={() => navigate("/incidents")}
-            className="flex items-center gap-1.5 sm:gap-2 text-slate-400 hover:text-white transition-colors text-xs sm:text-sm"
+            className="flex items-center gap-1.5 sm:gap-2 text-gray-500 hover:text-gray-900 transition-colors text-xs sm:text-sm"
           >
             <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span className="hidden xs:inline">Back to Incidents</span>
@@ -116,20 +118,19 @@ export default function IncidentDetails() {
             <span className={`px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full border ${config.bg} ${config.border} ${config.text}`}>
               {config.label}
             </span>
-            <span className="text-xs sm:text-sm text-slate-400 font-mono">
+            <span className="text-xs sm:text-sm text-gray-500 font-mono">
               #{incident.id}
             </span>
           </div>
         </div>
       </div>
 
-      {/* ✅ Responsive Content */}
+      {/* Content */}
       <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
 
-        {/* ✅ Hero Banner - Responsive */}
+        {/* Hero Banner */}
         <div className={`relative overflow-hidden border rounded-xl p-4 sm:p-5 md:p-6 mb-4 sm:mb-6 md:mb-8 ${config.bg} ${config.border}`}>
           
-          {/* Mobile: Stacked layout, Desktop: Row layout */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
             
             {/* Left side - Icon + Title */}
@@ -138,11 +139,11 @@ export default function IncidentDetails() {
                 <SeverityIcon className={`w-5 h-5 sm:w-6 sm:h-6 ${config.text}`} />
               </div>
               <div className="min-w-0">
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white truncate">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 truncate">
                   Incident #{incident.id}
                 </h1>
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 mt-1 sm:mt-2">
-                  <span className="flex items-center gap-1 text-xs sm:text-sm text-slate-400">
+                  <span className="flex items-center gap-1 text-xs sm:text-sm text-gray-500">
                     <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     <span className="truncate max-w-[120px] sm:max-w-[200px]">
                       {formatDate(incident.startedAt)}
@@ -155,15 +156,15 @@ export default function IncidentDetails() {
             {/* Right side - Duration + Status */}
             <div className="flex items-center gap-3 sm:gap-4 pl-12 sm:pl-14 md:pl-0">
               <div className="text-right">
-                <p className="text-[10px] sm:text-xs text-slate-400">Duration</p>
-                <p className="text-base sm:text-lg font-semibold text-white">
+                <p className="text-[10px] sm:text-xs text-gray-500">Duration</p>
+                <p className="text-base sm:text-lg font-semibold text-gray-900">
                   {getDuration(incident.startedAt, incident.resolvedAt)}
                 </p>
               </div>
-              <div className="w-px h-8 sm:h-10 bg-slate-700" />
+              <div className="w-px h-8 sm:h-10 bg-gray-200" />
               <div className="text-right">
-                <p className="text-[10px] sm:text-xs text-slate-400">Status</p>
-                <p className={`text-base sm:text-lg font-semibold ${incident.status === "RESOLVED" ? "text-emerald-400" : config.text}`}>
+                <p className="text-[10px] sm:text-xs text-gray-500">Status</p>
+                <p className={`text-base sm:text-lg font-semibold ${incident.status === "RESOLVED" ? "text-emerald-600" : config.text}`}>
                   {incident.status}
                 </p>
               </div>
@@ -173,33 +174,33 @@ export default function IncidentDetails() {
 
         <div className="space-y-4 sm:space-y-5 md:space-y-6">
 
-          {/* ✅ Root Cause - Responsive */}
-          <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 sm:p-5 md:p-6">
-            <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
+          {/* Root Cause */}
+          <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 md:p-6 shadow-sm">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
               Root Cause Analysis
             </h2>
-            <div className="bg-slate-800/30 border border-slate-700 rounded-lg p-3 sm:p-4">
-              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed break-words">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4">
+              <p className="text-gray-700 text-xs sm:text-sm leading-relaxed break-words">
                 {incident.reason || "No root cause analysis available"}
               </p>
             </div>
           </div>
 
-          {/* ✅ Timeline - Responsive */}
-          <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 sm:p-5 md:p-6">
-            <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
-              <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
+          {/* Timeline */}
+          <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 md:p-6 shadow-sm">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
               Incident Timeline
             </h2>
             <div className="space-y-3 sm:space-y-4">
               
               {/* Started Event */}
               <div className="flex items-start gap-2 sm:gap-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-red-400 mt-2 flex-shrink-0" />
-                <div className="flex-1 bg-slate-800/30 border border-slate-700 rounded-lg p-2.5 sm:p-3">
-                  <p className="text-xs sm:text-sm text-slate-300">Incident started</p>
-                  <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2 flex-shrink-0" />
+                <div className="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-2.5 sm:p-3">
+                  <p className="text-xs sm:text-sm text-gray-700">Incident started</p>
+                  <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">
                     {formatDate(incident.startedAt)}
                   </p>
                 </div>
@@ -208,10 +209,10 @@ export default function IncidentDetails() {
               {/* Resolved Event - if resolved */}
               {incident.resolvedAt && (
                 <div className="flex items-start gap-2 sm:gap-3">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 flex-shrink-0" />
-                  <div className="flex-1 bg-emerald-500/5 border border-emerald-500/20 rounded-lg p-2.5 sm:p-3">
-                    <p className="text-xs sm:text-sm text-emerald-400">Incident resolved</p>
-                    <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 flex-shrink-0" />
+                  <div className="flex-1 bg-emerald-50 border border-emerald-200 rounded-lg p-2.5 sm:p-3">
+                    <p className="text-xs sm:text-sm text-emerald-700">Incident resolved</p>
+                    <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">
                       {formatDate(incident.resolvedAt)}
                     </p>
                   </div>
@@ -221,10 +222,10 @@ export default function IncidentDetails() {
               {/* Acknowledged Event - if acknowledged but not resolved */}
               {incident.status === "ACKNOWLEDGED" && !incident.resolvedAt && (
                 <div className="flex items-start gap-2 sm:gap-3">
-                  <div className="w-1.5 h-1.5 rounded-full bg-yellow-400 mt-2 flex-shrink-0" />
-                  <div className="flex-1 bg-yellow-500/5 border border-yellow-500/20 rounded-lg p-2.5 sm:p-3">
-                    <p className="text-xs sm:text-sm text-yellow-400">Incident acknowledged</p>
-                    <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 mt-2 flex-shrink-0" />
+                  <div className="flex-1 bg-yellow-50 border border-yellow-200 rounded-lg p-2.5 sm:p-3">
+                    <p className="text-xs sm:text-sm text-yellow-700">Incident acknowledged</p>
+                    <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">
                       Being investigated
                     </p>
                   </div>
@@ -234,14 +235,14 @@ export default function IncidentDetails() {
             </div>
           </div>
 
-          {/* ✅ Resolve Button - Responsive (only for ACKNOWLEDGED) */}
+          {/* Resolve Button - only for ACKNOWLEDGED */}
           {isAcknowledged && (
-            <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 sm:p-5 md:p-6">
-              <h2 className="text-xs sm:text-sm font-medium text-slate-400 mb-3 sm:mb-4">Actions</h2>
+            <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 md:p-6 shadow-sm">
+              <h2 className="text-xs sm:text-sm font-medium text-gray-500 mb-3 sm:mb-4">Actions</h2>
               <button
                 onClick={resolveIncident}
                 disabled={resolving}
-                className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-800/50 disabled:cursor-not-allowed py-2.5 sm:py-3 px-4 rounded-lg text-white font-medium text-sm sm:text-base transition-all active:scale-95"
+                className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 disabled:cursor-not-allowed py-2.5 sm:py-3 px-4 rounded-lg text-white font-medium text-sm sm:text-base transition-all active:scale-95"
               >
                 {resolving ? (
                   <>
